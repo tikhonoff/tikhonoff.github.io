@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>strwrs</title>
+
+  <!-- Added link to the jQuery Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!-- Added a link to Bootstrap-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+  <style>
+
+    html, body {
+        height: 100%;
+    }
+
+
+    .char-area{
+      height: 100px;
+    }
+
+    .inp{
+
+      font-size: 10px;
+      margin: 0px;
+    }
+
+    h3{
+      font-size: 25px;
+      margin-bottom: 0px;
+      margin-top: 10px;
+    }
+
+    .bg {
+        background-image: url("96960300.jpg");
+        filter:contrast(80%);
+        min-height: 100%;
+        height: 120%; 
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+
+    .character {
+        width: 115px; height: 100px;  
+        float: left; 
+        margin: 5px;
+        border: 1px solid #ccc;
+        border-color: green;
+        background-color: white;
+        text-align:center;
+
+    }
+
+
+    .enemies{
+        background-color: red;
+
+    }
+
+    .chosenone{
+      
+    }
+
+    .defender{
+      background-color: black;
+      color: white;
+    }
+
+    .btnmrgn{
+      margin-top: 10px;
+
+    }
+    div.desc {
+      padding: 15px;
+      text-align: center;
+    }
+
+  </style>
+
+</head>
+
+<body>
+<div class="bg">
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-9"> </div>
+    <div class="col">
+     <h2> StarWars RPG</h2>
+    </div>
+  </div>
+
+
+  <div class="row"><h3>Your Character</h3></div>
+  <div class="row char-area"  id="selectCh" > </div>
+
+  <div class="row"><h3>Enemies Available To Attack</h3></div>
+
+  <div class="row char-area" id="enemies-area"></div>
+
+  <div class="row"><h3>Fight Section</h3></div>
+
+<div class="row"> <button type="button" class="btn btn-dark btnmrgn" id="attack">Attack</button></div> 
+
+  <div class="row"><h3>Defender</h3></div>
+
+  <div class="row char-area" id="defender-area"></div>
+
+  <div class="row char-area"  id="display">   </div>
+
+  <div class="row"> <button type="button" class="btn btn-success" id="reset">reset</button></div>
+
+</div>
+ 
+
+</div>
+
+
+
+<script type="text/javascript">
+
+
+  $(document).ready(function() {
+
+      var  chosenone;
+      var  defender;
+      var  Characters;
+      var win;
+
+      function init(){
+
+        $("#reset").on('click',  function() {init();});
+        $("#attack").prop('disabled', false);
+
+        function Character (Name, ShrtName, HP, AttackPower, CounterAttackPower, ImgSrc) {
+        this.Name = Name;
+        this.ShrtName =ShrtName;
+        this.HP = HP;
+        this.AttackPower = AttackPower;
+        this.BaseAttackPower =6;
+        this.CounterAttackPower = CounterAttackPower;
+        this.ImgSrc = ImgSrc;
+        }
+
+        var Obi = new Character ("Obi-Wan Kenobi", "Obi",120, 8, 10, "obi.png");
+        var Luke = new Character ("Luke Skywalker ", "Luke",  100, 8, 5, "luke.png");
+        var DM = new Character ("Darth Maul", "DM",180, 8, 25, "dm.png");
+        var DS = new Character ("Darth Sidious", "DS", 150, 8, 18, "dc.png");
+        var Characters = [Obi, Luke, DM, DS];
+
+        chosenone=null;
+        defender=null;
+        Character=null;
+        win=false;
+
+        $("div.character").remove();
+        $("#reset").hide();
+
+
+        for (let i =0; i<Characters.length; i++){
+
+          var chDiv= $("<div>");
+          chDiv.addClass('character');
+          chDiv.attr('id', Characters[i].ShrtName);
+
+          var chName= $("<p>");
+          chName.addClass('inp');  
+          chName.text(Characters[i].Name);
+          chDiv.append(chName);
+
+          var chImg = $("<img>");
+          chImg.attr( 'src', "pics/"+Characters[i].ImgSrc);
+          chImg.attr({
+            with: "100px",
+            height: "70px",
+            alt: ""
+          }); 
+          chDiv.append(chImg);
+
+          var chHp= $("<p>");
+          chHp.attr('id', "hp_"+Characters[i].ShrtName);
+          chHp.addClass('inp');  
+          chHp.text(Characters[i].HP);
+          chDiv.append(chHp);
+
+          $("#selectCh").append(chDiv);
+          chDiv.on( "click", function(){placeChrs(Characters[i]);});
+      }
+    }
+    
+
+    init();
+
+    function placeChrs (d){
+
+       if (!chosenone){
+        chosenone=d;
+        $('.character').addClass("enemies");
+        $( "#"+d.ShrtName ).removeClass( "enemies" ).addClass("chosenone");
+        $('.enemies').prependTo("#enemies-area");
+        $("#display").html("");
+       }
+        else if (!defender){
+          defender=d;
+          $( "#"+d.ShrtName ).removeClass( "enemies" ).addClass("defender");
+          $( "#"+d.ShrtName).prependTo("#defender-area");  
+          $("#display").html("");
+        }
+    }
+
+
+    $("#attack").on( "click", function(){
+
+      if (!defender){$("#display").html("<p> No enemy here!</p>");}
+
+      if (defender.HP>0&&chosenone.HP>0){
+         //console.log("defender.HP "+defender.HP+"  chosenone.HP "+chosenone.HP);
+         defender.HP-=chosenone.AttackPower;
+
+         if  (defender.HP<=0){
+
+           $( "#"+defender.ShrtName).hide();//remove();
+          
+           if( $('#enemies-area .character').length>0){
+              $("#display").html("<p> You've defeated "+defender.Name+" you can chose another enemy.</p>");
+             // console.log("enms -"+$('#enemies-area .character').length);
+                defender = null;
+              } else { 
+                win=true; 
+                $("#display").html("<h3> You won!!!!</h3>");
+                $("#attack").prop('disabled', true);
+                $("#reset").show();
+              }
+          
+         } else {
+          chosenone.HP -= defender.CounterAttackPower; 
+          $("#"+ "hp_"+defender.ShrtName).text(defender.HP);
+          $("#"+ "hp_"+chosenone.ShrtName).text(chosenone.HP); 
+         }
+
+        if (!win){
+           if (chosenone.HP<=0)  {
+           $("#attack").prop('disabled', true);
+           $("#display").html("<h3> You've been defeated... Game Over!!!</h3>"); 
+           //debugger;
+           $("#reset").show(); 
+         } else{
+           $("#display").html("<p>You attacked "+defender.Name+" for "+
+            +chosenone.AttackPower +" damage. <br> "+defender.Name+
+            " attacked you back for "+defender.CounterAttackPower+" damage.</p>");  
+            chosenone.AttackPower +=chosenone.BaseAttackPower;  
+         } 
+       }
+
+
+      } else {
+         $("#display").html("Press reset!");
+      }
+
+       //console.log("defender.HP "+defender.HP+"  chosenone.HP "+chosenone.HP);
+    } );
+
+
+});
+
+
+</script>
+
+</body>
+</html>

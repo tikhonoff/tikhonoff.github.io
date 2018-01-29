@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+
+<title>Hangman!</title>
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+ 
+
+
+  </head>
+  <body>
+<div class="container">
+
+
+<p id="score"></p>
+<p id="word"></p>
+<p id="guesses"></p>
+<p id="text"></p>
+
+<script>
+var pickWord = function () {
+	var words = ["программа", "детерминант", "обезьяна" , "кошка", "компьютер", "волна", "портрет", "корабль", "космос", "интернет", "цепочка", "дротик", "человек", "мандарин", "машина", "автобус", "автомобиль", "озарение", "идея", "страх", "ужас", "номер", "комната", "оружие", "балкон", "терраса",  "картина", "светофор", "семафор", "индейка", "курица", "фонарь", "рыба", "фотография", "строка", "огонь", "вода", "сказка", "орудие", "броня", "инновация", "пруд", "речка", "чудовище", "шапка", "нитка", "бочка", "мусор", "останки", "клавиатура", "процессор", "блок", "видеокарта", "наушники", "портфель", "банка", "мозг", "рука", "конфета"];
+		
+		return words[Math.floor(Math.random() * words.length)];
+};
+
+
+var setupAnswerArray = function (word) {
+	var answerArray = [];
+	for (var i = 0; i < word.length; i++) {
+	answerArray[i] = "_";
+ }
+
+  return answerArray;
+};
+
+var showPlayerProgress = function (answerArray) {
+		alert(answerArray.join(" "));
+};
+
+var getGuess = function () {
+	return prompt("Угадайте букву или нажмите Отмена для выхода из игры");
+};
+
+var updateGameState = function (guess, word, answerArray) {
+		var appearances = 0;
+		for (var j = 0; j < word.length; j++) {
+		if (word[j] === guess && answerArray[j] !== guess) {
+		answerArray[j] = guess;
+		appearances++;
+		}
+	}
+
+	return appearances;
+};
+
+var showAnswerAndCongratulatePlayer = function (answerArray, numberAttempt) {
+	showPlayerProgress(answerArray);
+
+};
+
+var word = pickWord();
+var answerArray = setupAnswerArray(word);
+var remainingLetters = word.length;
+var numberAttempt = 9;
+
+while (remainingLetters > 0 && numberAttempt > 0) { showPlayerProgress(answerArray); var guess = getGuess();
+	if (guess === null) {
+	 break;
+	} else if (guess.length !== 1) {
+	 alert("Пожалуйста, введите только одну букву.");
+	} else {
+		guess = guess.toLowerCase();
+		var correctGuesses = updateGameState(guess, word, answerArray);
+		remainingLetters -= correctGuesses;
+		if(!correctGuesses) numberAttempt--;
+		document.querySelector("#text").innerHTML = numberAttempt+ " left";
+	}
+}
+
+alert(answerArray.join(" "));
+
+if (numberAttempt > 0) {
+
+
+document.querySelector("#text").innerHTML = "Отлично! Было загадано слово " + word;
+} else {
+ document.querySelector("#text").innerHTML = "Плохо! Вас повесили! Было загадано слово " + word;
+}
+
+showAnswerAndCongratulatePlayer(answerArray);
+</script>
+
+
+
+</div>
+</body>
+</html>
